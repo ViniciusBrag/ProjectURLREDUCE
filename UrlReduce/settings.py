@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-8k0ikxpf&c4#p!j20@25r5-7*!nl6nr*70%t-o4qrn(0u!fxa0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1' 'https://intense-meadow-44630.herokuapp.com']
 
 
 # Application definition
@@ -74,12 +75,31 @@ WSGI_APPLICATION = 'UrlReduce.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+database_url = os.environ.get('DATABASE_URL')
+if database_url is None:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+     database_url = database_url.replace('postgres://','')
+     credential, url = database_url.split('@')
+     usuario, senha = credential.split(':')
+     dominio_porta, banco_de_dados = url.split('/')
+     host, port = dominio_porta.split(':')
+
+     DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': BASE_DIR / 'db.sqlite3',
+            'USER': usuario,
+            'PASSWORD': senha,
+            'HOST': host,
+            'Port': port,
+        }
+    }
 
 
 # Password validation
